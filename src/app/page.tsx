@@ -188,23 +188,6 @@ export default function Home() {
           </div>
         )}
       </section>
-
-      {/* Quick links */}
-      <section className="border-t border-border bg-muted/30">
-        <div className="container px-4 py-12 md:py-16">
-          <h2 className="mb-6 text-center text-2xl font-semibold">
-            Get started
-          </h2>
-          <div className="mx-auto flex max-w-md flex-col gap-4 sm:flex-row sm:justify-center">
-            <Button asChild variant="secondary" className="flex-1">
-              <Link href="/login">Log in</Link>
-            </Button>
-            <Button asChild className="flex-1">
-              <Link href="/register">Create account</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
