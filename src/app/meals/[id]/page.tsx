@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Loader2, Minus, Plus, Store, UtensilsCrossed } from "lucide-react";
+import { ArrowLeft, Loader2, Minus, Plus, Star, Store, UtensilsCrossed } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { useCart } from "@/contexts/cart-context";
+import { useSession } from "@/lib/auth-client";
 import type { Meal, Review } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
 function priceValue(m: Meal): number {
@@ -29,11 +31,15 @@ export default function MealDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const { addItem } = useCart();
+  const { data: session } = useSession();
   const [meal, setMeal] = useState<Meal | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   const fetchMeal = useCallback(async () => {
     if (!id) return;
@@ -82,6 +88,32 @@ export default function MealDetailPage() {
       description: `${quantity} × ${meal.name} added.`,
     });
     setQuantity(1);
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id || reviewRating < 1 || reviewRating > 5) return;
+    setSubmittingReview(true);
+    try {
+      await api("/api/reviews", {
+        method: "POST",
+        body: JSON.stringify({
+          mealId: id,
+          rating: reviewRating,
+          comment: reviewComment.trim() || undefined,
+        }),
+      });
+      toast.success("Review submitted", { description: "Thanks for your feedback." });
+      setReviewRating(0);
+      setReviewComment("");
+      fetchReviews();
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to submit review"
+      );
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   if (loading) {
@@ -234,9 +266,64 @@ export default function MealDetailPage() {
       </div>
 
       {/* Reviews */}
-      {reviews.length > 0 && (
-        <section className="mt-12">
-          <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+      <section className="mt-12">
+        <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+
+        {session?.user?.role === "CUSTOMER" && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg">Leave a review</CardTitle>
+              <CardDescription>
+                Share your experience. You must be signed in as a customer.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmitReview} className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Rating (1–5)</Label>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setReviewRating(star)}
+                        className="rounded p-1 text-2xl text-amber-500 transition-colors hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        style={{
+                          opacity: reviewRating >= star ? 1 : 0.35,
+                        }}
+                        aria-label={`${star} star${star !== 1 ? "s" : ""}`}
+                      >
+                        <Star
+                          className="size-8 fill-current"
+                          aria-hidden
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="review-comment">Comment (optional)</Label>
+                  <textarea
+                    id="review-comment"
+                    className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="How was your meal?"
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    disabled={submittingReview}
+                    rows={3}
+                  />
+                </div>
+                <Button type="submit" disabled={reviewRating < 1 || submittingReview}>
+                  {submittingReview ? "Submitting…" : "Submit review"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        )}
+
+        {reviews.length === 0 ? (
+          <p className="text-muted-foreground text-sm">No reviews yet.</p>
+        ) : (
           <div className="space-y-4">
             {reviews.map((r) => (
               <Card key={r.id}>
@@ -265,8 +352,8 @@ export default function MealDetailPage() {
               </Card>
             ))}
           </div>
-        </section>
-      )}
+        )}
+      </section>
     </div>
   );
 }
