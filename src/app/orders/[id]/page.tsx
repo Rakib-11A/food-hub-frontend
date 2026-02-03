@@ -85,18 +85,26 @@ export default function OrderDetailPage() {
     }
   }, [id]);
 
+  const isCustomer = session?.user?.role === "CUSTOMER";
+  const isAdmin = session?.user?.role === "ADMIN";
+  const canView = isCustomer || isAdmin;
+
   useEffect(() => {
     if (!session && !isPending) return;
-    if (session?.user?.role !== "CUSTOMER") return;
+    if (!canView) return;
     fetchOrder();
-  }, [session, isPending, fetchOrder]);
+  }, [session, isPending, canView, fetchOrder]);
 
-  if (!isPending && (!session || session.user?.role !== "CUSTOMER")) {
-    router.replace("/login");
-    return null;
-  }
+  useEffect(() => {
+    if (isPending) return;
+    if (!session) {
+      router.replace("/login");
+      return;
+    }
+    if (!canView) router.replace("/");
+  }, [isPending, session, canView, router]);
 
-  if (isPending && !session) {
+  if (isPending || !session || !canView) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center py-16">
         <Loader2

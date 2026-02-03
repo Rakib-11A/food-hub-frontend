@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, User } from "lucide-react";
 import { toast } from "sonner";
@@ -24,11 +24,10 @@ export default function ProfilePage() {
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Protected: redirect if not authenticated
-  if (!isPending && !session) {
-    router.replace("/login");
-    return null;
-  }
+  useEffect(() => {
+    if (isPending) return;
+    if (!session) router.replace("/login");
+  }, [isPending, session, router]);
 
   const user = session?.user;
   const currentInput = name || (user?.name ?? "");

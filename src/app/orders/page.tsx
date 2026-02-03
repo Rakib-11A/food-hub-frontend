@@ -56,6 +56,18 @@ export default function OrdersPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isPending) return;
+    if (!session) {
+      router.replace("/login");
+      return;
+    }
+    if (session.user?.role !== "CUSTOMER") {
+      router.replace("/");
+      return;
+    }
+  }, [isPending, session, router]);
+
+  useEffect(() => {
     if (!session && !isPending) return;
     if (session?.user?.role !== "CUSTOMER") return;
 
@@ -82,12 +94,8 @@ export default function OrdersPage() {
     };
   }, [session, isPending]);
 
-  if (!isPending && (!session || session.user?.role !== "CUSTOMER")) {
-    router.replace("/login");
-    return null;
-  }
-
-  if (isPending && !session) {
+  const isCustomer = session?.user?.role === "CUSTOMER";
+  if (isPending || !session || !isCustomer) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center py-16">
         <Loader2

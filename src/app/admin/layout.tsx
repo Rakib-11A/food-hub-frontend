@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import {
   LayoutDashboard,
   Loader2,
@@ -29,15 +30,19 @@ export default function AdminLayout({
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
 
-  if (!isPending && !session) {
-    router.replace("/login");
-    return null;
-  }
-  if (!isPending && session?.user?.role !== "ADMIN") {
-    router.replace("/");
-    return null;
-  }
-  if (isPending || !session) {
+  useEffect(() => {
+    if (isPending) return;
+    if (!session) {
+      router.replace("/login");
+      return;
+    }
+    if (session.user?.role !== "ADMIN") {
+      router.replace("/");
+    }
+  }, [isPending, session, router]);
+
+  const isAdmin = session?.user?.role === "ADMIN";
+  if (isPending || !session || !isAdmin) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

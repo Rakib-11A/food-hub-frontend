@@ -97,8 +97,12 @@ export function Header() {
   const role = session?.user?.role as UserRole | undefined;
 
   async function handleLogout() {
-    const { signOut } = await import("@/lib/auth-client").then((m) => m.authClient);
-    await signOut();
+    try {
+      const { signOut } = await import("@/lib/auth-client").then((m) => m.authClient);
+      await signOut();
+    } catch {
+      // Backend unreachable (e.g. not running, wrong URL) – still clear local session
+    }
     router.push("/");
     router.refresh();
   }
