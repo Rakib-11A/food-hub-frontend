@@ -33,12 +33,10 @@ export default function AdminLayout({
     router.replace("/login");
     return null;
   }
-
   if (!isPending && session?.user?.role !== "ADMIN") {
     router.replace("/");
     return null;
   }
-
   if (isPending || !session) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">

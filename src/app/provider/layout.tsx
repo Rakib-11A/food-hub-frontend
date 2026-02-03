@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Loader2, ShoppingBag, UtensilsCrossed } from "lucide-react";
+import {
+  LayoutDashboard,
+  Loader2,
+  ShoppingBag,
+  UtensilsCrossed,
+} from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -26,12 +31,10 @@ export default function ProviderLayout({
     router.replace("/login");
     return null;
   }
-
   if (!isPending && session?.user?.role !== "PROVIDER") {
     router.replace("/");
     return null;
   }
-
   if (isPending || !session) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
@@ -50,7 +53,10 @@ export default function ProviderLayout({
             size="sm"
             asChild
           >
-            <Link href={href} className={cn("gap-2", pathname === href && "font-medium")}>
+            <Link
+              href={href}
+              className={cn("gap-2", pathname === href && "font-medium")}
+            >
               <Icon className="size-4" />
               {label}
             </Link>

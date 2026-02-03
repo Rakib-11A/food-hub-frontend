@@ -105,8 +105,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center justify-between gap-4 px-4 md:px-6">
-        {/* Logo */}
+      <div className=" flex h-14 items-center justify-between gap-4 px-4 md:px-6">
         <Link
           href="/"
           className="flex items-center gap-2 font-semibold text-foreground hover:opacity-90"
@@ -115,7 +114,7 @@ export function Header() {
           <span className="hidden sm:inline">FoodHub</span>
         </Link>
 
-        {/* Desktop nav */}
+
         <nav className="hidden items-center gap-1 md:flex">
           {navLinks.map(({ href, label, icon: Icon }) => (
             <Button

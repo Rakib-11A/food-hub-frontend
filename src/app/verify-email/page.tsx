@@ -27,26 +27,8 @@ function VerifyEmailContent() {
   }>({ status: "loading", message: null });
   const { status, message } = state;
 
-  // Derive error state for missing token/API_URL (no setState in effect)
-  if (!API_URL) {
-    return (
-      <ErrorCard
-        title="Configuration error"
-        message="Please try again later."
-      />
-    );
-  }
-  if (!token || token.trim() === "") {
-    return (
-      <ErrorCard
-        title="Verification failed"
-        message="Invalid or expired link. No verification token found."
-      />
-    );
-  }
-
   useEffect(() => {
-    if (status !== "loading") return;
+    if (!API_URL || !token?.trim() || status !== "loading") return;
     let cancelled = false;
 
     const verify = async () => {
@@ -87,6 +69,24 @@ function VerifyEmailContent() {
       cancelled = true;
     };
   }, [token, status]);
+
+  // Renders: after all hooks so hooks are never conditional
+  if (!API_URL) {
+    return (
+      <ErrorCard
+        title="Configuration error"
+        message="Please try again later."
+      />
+    );
+  }
+  if (!token || token.trim() === "") {
+    return (
+      <ErrorCard
+        title="Verification failed"
+        message="Invalid or expired link. No verification token found."
+      />
+    );
+  }
 
   if (status === "loading" || status === "idle") {
     return (
