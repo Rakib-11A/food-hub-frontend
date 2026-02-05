@@ -45,11 +45,11 @@ export default function ProviderLayout({
     fetch(`${API_BASE}/api/providers/profile`, { credentials: "include" })
       .then((res) => {
         if (cancelled) return;
-        if (res.status === 404) setProfileCheck("missing");
-        else setProfileCheck("ok");
+        if (res.status === 200) setProfileCheck("ok");
+        else setProfileCheck("missing");
       })
       .catch(() => {
-        if (!cancelled) setProfileCheck("ok");
+        if (!cancelled) setProfileCheck("missing");
       });
     return () => {
       cancelled = true;
