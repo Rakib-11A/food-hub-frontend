@@ -78,11 +78,16 @@ export default function MealDetailPage() {
   const handleAddToCart = () => {
     if (!meal || !meal.isAvailable) return;
     const price = priceValue(meal);
+    const providerId = meal.providerProfileId ?? meal.providerProfile?.id;
+    if (!providerId) {
+      toast.error("Cannot add to cart", { description: "Meal provider is missing." });
+      return;
+    }
     addItem(meal.id, quantity, {
       name: meal.name,
       price,
       image: meal.image,
-      providerProfileId: meal.providerProfileId,
+      providerProfileId: providerId,
     });
     toast.success("Added to cart", {
       description: `${quantity} × ${meal.name} added.`,

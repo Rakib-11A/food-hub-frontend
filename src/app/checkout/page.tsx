@@ -168,7 +168,24 @@ export default function CheckoutPage() {
                 {error && (
                   <Alert variant="destructive">
                     <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
+                    <AlertDescription className="space-y-2">
+                      <span className="block">{error}</span>
+                      {error.includes("remove them from your cart") && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="mt-2 border-destructive text-destructive hover:bg-destructive/10"
+                          onClick={() => {
+                            clearCart();
+                            setError(null);
+                            toast.info("Cart cleared. You can add items again from the menu.");
+                          }}
+                        >
+                          Clear cart and start over
+                        </Button>
+                      )}
+                    </AlertDescription>
                   </Alert>
                 )}
                 <div className="space-y-2">
