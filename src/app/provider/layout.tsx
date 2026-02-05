@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Loader2,
@@ -18,6 +19,11 @@ const providerNav = [
   { href: "/provider/orders", label: "Orders", icon: ShoppingBag },
 ];
 
+const API_BASE =
+  typeof process.env.NEXT_PUBLIC_API_URL === "string"
+    ? process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")
+    : "";
+
 export default function ProviderLayout({
   children,
 }: {
@@ -26,6 +32,35 @@ export default function ProviderLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
+  const [profileCheck, setProfileCheck] = useState<"loading" | "ok" | "missing">("loading");
+  const isProfilePage = pathname === "/provider/profile";
+
+  useEffect(() => {
+    if (!session || session.user?.role !== "PROVIDER" || !API_BASE || isProfilePage) {
+      if (isProfilePage) setProfileCheck("ok");
+      return;
+    }
+    let cancelled = false;
+    setProfileCheck("loading");
+    fetch(`${API_BASE}/api/providers/profile`, { credentials: "include" })
+      .then((res) => {
+        if (cancelled) return;
+        if (res.status === 404) setProfileCheck("missing");
+        else setProfileCheck("ok");
+      })
+      .catch(() => {
+        if (!cancelled) setProfileCheck("ok");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [session, isProfilePage]);
+
+  useEffect(() => {
+    if (profileCheck === "missing" && !isProfilePage) {
+      router.replace("/provider/profile");
+    }
+  }, [profileCheck, isProfilePage, router]);
 
   if (!isPending && !session) {
     router.replace("/login");
@@ -41,6 +76,18 @@ export default function ProviderLayout({
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
+  }
+
+  if (!isProfilePage && profileCheck === "loading") {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!isProfilePage && profileCheck === "missing") {
+    return null;
   }
 
   return (
@@ -62,6 +109,11 @@ export default function ProviderLayout({
             </Link>
           </Button>
         ))}
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/provider/profile" className="gap-2">
+            Profile
+          </Link>
+        </Button>
       </nav>
       {children}
     </div>
