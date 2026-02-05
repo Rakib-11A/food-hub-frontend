@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Filter, Loader2, UtensilsCrossed, X } from "lucide-react";
@@ -97,7 +97,7 @@ function MealCard({ meal }: { meal: Meal }) {
   );
 }
 
-export default function MealsPage() {
+function MealsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [categories, setCategories] = useState<Category[]>([]);
@@ -326,5 +326,22 @@ export default function MealsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function MealsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <Loader2
+            className="size-10 animate-spin text-muted-foreground"
+            aria-hidden
+          />
+        </div>
+      }
+    >
+      <MealsPageContent />
+    </Suspense>
   );
 }
