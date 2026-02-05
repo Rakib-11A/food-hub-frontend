@@ -120,11 +120,16 @@ export default function ProviderDetailPage() {
   const handleAddToCart = useCallback(
     (meal: Meal) => {
       const price = mealPrice(meal);
+      const providerId = meal.providerProfileId ?? meal.providerProfile?.id;
+      if (!providerId) {
+        toast.error("Cannot add to cart", { description: "Meal provider is missing." });
+        return;
+      }
       addItem(meal.id, 1, {
         name: meal.name,
         price,
         image: meal.image,
-        providerProfileId: meal.providerProfileId,
+        providerProfileId: providerId,
       });
       toast.success("Added to cart", {
         description: `${meal.name} added.`,
