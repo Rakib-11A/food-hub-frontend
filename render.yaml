@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: food-hub-frontend
+    runtime: node
+    repo: # Set in Dashboard or replace with your repo URL
+    branch: main
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+      - key: NODE_VERSION
+        value: "20"
