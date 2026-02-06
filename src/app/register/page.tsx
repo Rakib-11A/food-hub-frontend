@@ -70,16 +70,16 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="flex min-h-[80vh] items-center justify-center px-4">
+      <div className="flex min-h-[80vh] items-center justify-center px-4 py-10 md:py-16">
         <Card className="w-full max-w-md">
-          <CardHeader>
+          <CardHeader className="space-y-1.5">
             <CardTitle>Check your email</CardTitle>
             <CardDescription>
               We sent a verification link to <strong>{email}</strong>. Click the
               link in that email to verify your account, then you can sign in.
             </CardDescription>
           </CardHeader>
-          <CardFooter className="flex flex-col gap-2">
+          <CardFooter className="flex flex-col gap-3 pt-6">
             <Button asChild className="w-full">
               <Link href="/login">Go to login</Link>
             </Button>
@@ -93,9 +93,9 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-4 py-8">
+    <div className="flex min-h-[80vh] items-center justify-center px-4 py-10 md:py-16">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
+        <CardHeader className="space-y-1.5 pb-2">
           <CardTitle className="text-2xl">Create an account</CardTitle>
           <CardDescription>
             Enter your details to register. You’ll verify your email before
@@ -103,7 +103,7 @@ export default function RegisterPage() {
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 pt-2">
             {error && (
               <Alert variant="destructive">
                 <AlertTitle>Error</AlertTitle>
@@ -153,19 +153,19 @@ export default function RegisterPage() {
                 className="bg-background"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>I want to</Label>
               <RadioGroup
                 value={role}
                 onValueChange={(value) => setRole(value as UserRole)}
                 disabled={loading}
-                className="grid gap-2"
+                className="grid gap-2.5"
               >
                 {ROLES.map((r) => (
                   <label
                     key={r.value}
                     htmlFor={r.value}
-                    className="flex cursor-pointer items-center gap-3 rounded-md border border-input bg-card px-3 py-2 transition-colors hover:bg-accent/50 has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5"
+                    className="flex cursor-pointer items-center gap-3 rounded-md border border-input bg-card px-4 py-3 transition-colors hover:bg-accent/50 has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5"
                   >
                     <RadioGroupItem value={r.value} id={r.value} />
                     <span className="text-sm font-medium">{r.label}</span>
@@ -174,7 +174,7 @@ export default function RegisterPage() {
               </RadioGroup>
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-4">
+          <CardFooter className="flex flex-col gap-5 border-t pt-6">
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Creating account…" : "Create account"}
             </Button>

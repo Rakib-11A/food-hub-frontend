@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChefHat, Mail, MapPin, UtensilsCrossed } from "lucide-react";
+import { ChefHat, Mail, MapPin, Store, UtensilsCrossed } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const footerLinks = [
@@ -10,6 +10,7 @@ const footerLinks = [
   { href: "/providers", label: "Providers" },
   { href: "/login", label: "Login" },
   { href: "/register", label: "Register" },
+  { href: "/provider/profile", label: "For providers" },
 ];
 
 export function Footer() {
@@ -69,6 +70,15 @@ export function Footer() {
                 >
                   <MapPin className="size-4" />
                   Find providers
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/provider/profile"
+                  className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <Store className="size-4" />
+                  Create provider profile
                 </Link>
               </li>
             </ul>

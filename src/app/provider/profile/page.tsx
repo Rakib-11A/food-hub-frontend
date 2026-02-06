@@ -62,21 +62,21 @@ export default function ProviderProfilePage() {
   };
 
   return (
-    <div className="mx-auto max-w-xl space-y-6">
-      <div>
+    <div className="mx-auto max-w-xl space-y-8 px-2 py-8 md:py-12">
+      <div className="space-y-1">
         <h1 className="text-3xl font-bold tracking-tight">Provider profile</h1>
-        <p className="mt-1 text-muted-foreground">
+        <p className="text-muted-foreground">
           Create your business profile to start adding meals and receiving orders.
         </p>
       </div>
 
       <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <div className="rounded-lg bg-primary/10 p-2">
+        <CardHeader className="space-y-1.5 pb-2">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-primary/10 p-2.5">
               <Store className="h-5 w-5 text-primary" />
             </div>
-            <div>
+            <div className="space-y-0.5">
               <CardTitle>Business details</CardTitle>
               <CardDescription>
                 This information will be shown to customers.
@@ -85,7 +85,7 @@ export default function ProviderProfilePage() {
           </div>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 pt-2">
             {error && (
               <Alert variant="destructive">
                 <AlertTitle>Error</AlertTitle>
@@ -135,7 +135,7 @@ export default function ProviderProfilePage() {
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-3 sm:flex-row">
+          <CardFooter className="flex flex-col gap-3 border-t pt-6 sm:flex-row">
             <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
               {submitting ? (
                 <>
