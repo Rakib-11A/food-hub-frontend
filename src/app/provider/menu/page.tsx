@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useRouter } from "next/navigation";
 import {
   Loader2,
   Pencil,
@@ -64,7 +65,11 @@ function mealPrice(meal: Meal): number {
     : parseFloat(String(meal.price)) || 0;
 }
 
+const PROFILE_ERROR = "provider profile not found";
+const CREATE_PROFILE_ERROR = "create a provider profile";
+
 export default function ProviderMenuPage() {
+  const router = useRouter();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,10 +113,14 @@ export default function ProviderMenuPage() {
       const all = mealsRes.data ?? [];
       setMeals(all.filter((m) => m.providerProfileId === providerProfileId));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load menu");
+      const msg = err instanceof Error ? err.message : "Failed to load menu";
+      setError(msg);
       setMeals([]);
+      if (msg.toLowerCase().includes(PROFILE_ERROR) || msg.toLowerCase().includes(CREATE_PROFILE_ERROR)) {
+        router.replace("/provider/profile");
+      }
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     let cancelled = false;
@@ -123,8 +132,14 @@ export default function ProviderMenuPage() {
         if (!cancelled) setCategories(res.data ?? []);
       }),
     ])
-      .catch(() => {
-        if (!cancelled) setError("Failed to load data");
+      .catch((err) => {
+        if (!cancelled) {
+          const msg = err instanceof Error ? err.message : "Failed to load data";
+          setError(msg);
+          if (msg.toLowerCase().includes(PROFILE_ERROR) || msg.toLowerCase().includes(CREATE_PROFILE_ERROR)) {
+            router.replace("/provider/profile");
+          }
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -133,7 +148,7 @@ export default function ProviderMenuPage() {
     return () => {
       cancelled = true;
     };
-  }, [loadMeals]);
+  }, [loadMeals, router]);
 
   const resetForm = useCallback(() => {
     setName("");
@@ -199,7 +214,7 @@ export default function ProviderMenuPage() {
       try {
         if (isEditing && editingMeal) {
           await api(`/api/provider/meals/${editingMeal.id}`, {
-            method: "PATCH",
+            method: "PUT",
             body: JSON.stringify(body),
           });
           toast.success("Meal updated");

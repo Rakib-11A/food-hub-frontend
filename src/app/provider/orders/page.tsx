@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Loader2,
   MapPin,
@@ -77,7 +78,11 @@ function orderShortId(id: string): string {
   return "#" + id.slice(-8).toUpperCase();
 }
 
+const PROFILE_ERROR = "provider profile not found";
+const CREATE_PROFILE_ERROR = "create a provider profile";
+
 export default function ProviderOrdersPage() {
+  const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,12 +94,16 @@ export default function ProviderOrdersPage() {
       const res = await api<Order[]>("/api/provider/orders");
       setOrders(res.data ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load orders");
+      const msg = err instanceof Error ? err.message : "Failed to load orders";
+      setError(msg);
       setOrders([]);
+      if (msg.toLowerCase().includes(PROFILE_ERROR) || msg.toLowerCase().includes(CREATE_PROFILE_ERROR)) {
+        router.replace("/provider/profile");
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     loadOrders();
