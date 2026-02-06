@@ -214,7 +214,7 @@ export default function ProviderMenuPage() {
       try {
         if (isEditing && editingMeal) {
           await api(`/api/provider/meals/${editingMeal.id}`, {
-            method: "PATCH",
+            method: "PUT",
             body: JSON.stringify(body),
           });
           toast.success("Meal updated");
