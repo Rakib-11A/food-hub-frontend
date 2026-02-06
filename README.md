@@ -1,31 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+FoodHub — Frontend (সংক্ষেপে)
 
-## Getting Started
+FoodHub Frontend হলো ইউজারদের জন্য তৈরি করা ওয়েব অ্যাপ—যেখানে মানুষ খাবার খুঁজে পায়, অর্ডার দেয়, আর রেস্টুরেন্টগুলো তাদের মেনু ও অর্ডার ম্যানেজ করে।
+এই repo–টা শুধু frontend; সব data, auth আর business logic আসে FoodHub Backend API থেকে।
 
-First, run the development server:
+কারা ব্যবহার করবে?
 
-```bash
+Everyone
+খাবার ও রেস্টুরেন্ট ব্রাউজ, category ও price অনুযায়ী ফিল্টার, provider–এর পুরো মেনু দেখা।
+
+Customers
+একাউন্ট তৈরি, cart-এ খাবার যোগ, cash-on-delivery checkout, অর্ডার ট্র্যাক, রিভিউ ও প্রোফাইল আপডেট।
+
+Providers
+vendor হিসেবে রেজিস্ট্রেশন, business profile তৈরি, মেনু add/edit, অর্ডারের স্ট্যাটাস আপডেট।
+
+Admins
+ইউজার ম্যানেজ (suspend/activate), সব অর্ডার দেখা, ক্যাটাগরি ম্যানেজ।
+
+Tech & UI
+
+Next.js (React)
+
+Tailwind CSS
+
+Radix-style UI components
+
+Better Auth (session + cookie based login)
+
+Responsive design with Light/Dark mode
+
+কীভাবে কাজ করে?
+
+Frontend নিজে কোনো data রাখে না।
+সব API call যায় Backend–এ, তাই চালানোর আগে শুধু দরকার:
+
+NEXT_PUBLIC_API_URL=https://your-backend-api.com
+
+এই URL দিয়েই meals, auth, orders—সবকিছু লোড হয়।
+
+লোকালি রান করতে
+npm install
 npm run dev
 
-```
+তারপর খুলুন: http://localhost:3000
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Backend ঠিকমতো না চললে বা env ভুল হলে data লোড হবে না—এটাই সবচেয়ে common issue।
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Project structure (এক নজরে)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+src/app/ — Pages & routes (home, meals, cart, orders, provider dashboard, admin)
 
-## Learn More
+src/components/ — Reusable UI components
 
-To learn more about Next.js, take a look at the following resources:
+src/contexts/ — Cart state (global)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+src/lib/ — API client, auth client, utilities
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+src/types/ — Shared TypeScript types
 
-## Deploy on Vercel
+Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Vercel (recommended) বা যেকোনো Next.js hosting-এ deploy করা যায়।
+Deploy করার সময় শুধু NEXT_PUBLIC_API_URL–এ live backend URL সেট করলেই হবে।
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Bottom line
+
+FoodHub Frontend হলো পুরো অ্যাপের মুখ (UI)।
+Backend যেখানে brain, frontend সেখানে experience—clean, responsive, role-based dashboard সহ।
