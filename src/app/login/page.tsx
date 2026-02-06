@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -19,14 +19,21 @@ import {
 } from "@/components/ui/card";
 import type { UserRole } from "@/types";
 
-function getRedirectForRole(role: UserRole): string {
+function getRedirectForRole(role: UserRole, callbackUrl: string | null): string {
+  if (callbackUrl && callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")) {
+    if (role === "PROVIDER" && callbackUrl === "/provider/profile") return callbackUrl;
+    if (role === "ADMIN" && callbackUrl.startsWith("/admin")) return callbackUrl;
+    if (role === "CUSTOMER" && !callbackUrl.startsWith("/admin") && !callbackUrl.startsWith("/provider")) return callbackUrl;
+  }
   if (role === "ADMIN") return "/admin";
   if (role === "PROVIDER") return "/provider/dashboard";
   return "/";
 }
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +60,7 @@ export default function LoginPage() {
 
       const user = result.data?.user as { role?: UserRole } | undefined;
       const role = user?.role ?? "CUSTOMER";
-      router.push(getRedirectForRole(role));
+      router.push(getRedirectForRole(role, callbackUrl));
       router.refresh();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
@@ -65,16 +72,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-4 py-8">
+    <div className="flex min-h-[80vh] items-center justify-center px-4 py-10 md:py-16">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
+        <CardHeader className="space-y-1.5 pb-2">
           <CardTitle className="text-2xl">Sign in</CardTitle>
           <CardDescription>
             Enter your email and password to access your account.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 pt-2">
             {error && (
               <Alert variant="destructive">
                 <AlertTitle>Error</AlertTitle>
@@ -110,7 +117,7 @@ export default function LoginPage() {
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-4">
+          <CardFooter className="flex flex-col gap-5 border-t pt-6">
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Signing in…" : "Sign in"}
             </Button>
@@ -123,9 +130,26 @@ export default function LoginPage() {
                 Register
               </Link>
             </p>
+            <p className="text-center text-sm text-muted-foreground">
+              Are you a provider?{" "}
+              <Link
+                href="/provider/profile"
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
+                Create your business profile
+              </Link>
+            </p>
           </CardFooter>
         </form>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-[80vh] items-center justify-center">Loading…</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

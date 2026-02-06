@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChefHat, UtensilsCrossed, Store, Loader2 } from "lucide-react";
+import {
+  ChefHat,
+  Loader2,
+  ShoppingBag,
+  Store,
+  UtensilsCrossed,
+} from "lucide-react";
 import { api } from "@/lib/api";
 import type { Category, Meal } from "@/types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -15,6 +21,33 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
+const HOW_IT_WORKS = [
+  {
+    step: 1,
+    title: "Browse meals",
+    description: "Explore dishes from local providers and filter by category or diet.",
+    icon: UtensilsCrossed,
+  },
+  {
+    step: 2,
+    title: "Add to cart",
+    description: "Pick your favorites and add them to your cart in one place.",
+    icon: ShoppingBag,
+  },
+  {
+    step: 3,
+    title: "Checkout",
+    description: "Enter your delivery address and place your order. Pay on delivery.",
+    icon: Store,
+  },
+  {
+    step: 4,
+    title: "Enjoy",
+    description: "Track your order and get fresh food delivered to your door.",
+    icon: ChefHat,
+  },
+];
 
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -54,7 +87,7 @@ export default function Home() {
 
   return (
     <div className="bg-background text-foreground">
-      {/* Hero */}
+      {/* Section 1: Hero */}
       <section className="container flex flex-col items-center justify-center gap-6 px-4 py-20 text-center md:py-28">
         <div className="flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5 text-sm text-muted-foreground">
           <ChefHat className="size-4" />
@@ -83,9 +116,38 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Section 2: How it works */}
       <section className="border-t border-border bg-muted/30">
-        <div className="container px-4 py-8 md:py-10">
+        <div className="container px-4 py-10 md:py-14">
+          <h2 className="mb-2 text-center text-2xl font-semibold">
+            How it works
+          </h2>
+          <p className="mx-auto mb-10 max-w-lg text-center text-muted-foreground">
+            Order food in four simple steps.
+          </p>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {HOW_IT_WORKS.map(({ step, title, description, icon: Icon }) => (
+              <div
+                key={step}
+                className="flex flex-col items-center rounded-lg border bg-background p-6 text-center shadow-sm"
+              >
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <Icon className="size-6" />
+                </div>
+                <span className="mb-1 text-sm font-medium text-muted-foreground">
+                  Step {step}
+                </span>
+                <h3 className="mb-2 font-semibold">{title}</h3>
+                <p className="text-sm text-muted-foreground">{description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 3: Categories */}
+      <section className="border-t border-border">
+        <div className="container px-4 py-10 md:py-14">
           <h2 className="mb-4 text-center text-2xl font-semibold">
             Categories
           </h2>
@@ -94,7 +156,7 @@ export default function Home() {
               <Loader2 className="size-8 animate-spin text-muted-foreground" />
             </div>
           ) : error ? (
-            <Alert variant="destructive" className="max-w-2xl mx-auto">
+            <Alert variant="destructive" className="mx-auto max-w-2xl">
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
@@ -117,77 +179,80 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured / recent meals */}
-      <section className="container px-4 py-10 md:py-14">
-        <h2 className="mb-6 text-center text-2xl font-semibold">
-          Featured meals
-        </h2>
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="size-10 animate-spin text-muted-foreground" />
-          </div>
-        ) : error ? null : meals.length === 0 ? (
-          <p className="text-center text-muted-foreground">
-            No meals available yet. Check back soon.
-          </p>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {meals.slice(0, 9).map((meal) => (
-              <Card
-                key={meal.id}
-                className="overflow-hidden transition-shadow hover:shadow-md"
-              >
-                <Link href={`/meals/${meal.id}`} className="block">
-                  <div className="relative aspect-[4/3] w-full bg-muted">
-                    {meal.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={meal.image}
-                        alt={meal.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-muted-foreground">
-                        <UtensilsCrossed className="size-12" />
-                      </div>
-                    )}
-                  </div>
-                </Link>
-                <CardHeader className="pb-2">
-                  <CardTitle className="line-clamp-1 text-lg">
-                    {meal.name}
-                  </CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {meal.description ?? "No description"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <p className="text-lg font-semibold text-foreground">
-                    ৳{price(meal).toFixed(2)}
-                  </p>
-                  {meal.providerProfile && (
-                    <p className="text-sm text-muted-foreground">
-                      {meal.providerProfile.businessName}
+      {/* Section 4: Featured meals */}
+      <section className="border-t border-border bg-muted/30">
+        <div className="container px-4 py-10 md:py-14">
+          <h2 className="mb-6 text-center text-2xl font-semibold">
+            Featured meals
+          </h2>
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="size-10 animate-spin text-muted-foreground" />
+            </div>
+          ) : error ? null : meals.length === 0 ? (
+            <p className="text-center text-muted-foreground">
+              No meals available yet. Check back soon.
+            </p>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {meals.slice(0, 9).map((meal) => (
+                <Card
+                  key={meal.id}
+                  className="overflow-hidden transition-shadow hover:shadow-md"
+                >
+                  <Link href={`/meals/${meal.id}`} className="block">
+                    <div className="relative aspect-4/3 w-full bg-muted">
+                      {meal.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={meal.image}
+                          alt={meal.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-muted-foreground">
+                          <UtensilsCrossed className="size-12" />
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="line-clamp-1 text-lg">
+                      {meal.name}
+                    </CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      {meal.description ?? "No description"}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pb-2">
+                    <p className="text-lg font-semibold text-foreground">
+                      ৳{price(meal).toFixed(2)}
                     </p>
-                  )}
-                </CardContent>
-                <CardFooter className="pt-2">
-                  <Button asChild className="w-full">
-                    <Link href={`/meals/${meal.id}`}>View & add to cart</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        )}
-        {!loading && !error && meals.length > 9 && (
-          <div className="mt-8 text-center">
-            <Button asChild variant="outline" size="lg">
-              <Link href="/meals">View all meals</Link>
-            </Button>
-          </div>
-        )}
+                    {meal.providerProfile && (
+                      <p className="text-sm text-muted-foreground">
+                        {meal.providerProfile.businessName}
+                      </p>
+                    )}
+                  </CardContent>
+                  <CardFooter className="pt-2">
+                    <Button asChild className="w-full">
+                      <Link href={`/meals/${meal.id}`}>View & add to cart</Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          )}
+          {!loading && !error && meals.length > 9 && (
+            <div className="mt-8 text-center">
+              <Button asChild variant="outline" size="lg">
+                <Link href="/meals">View all meals</Link>
+              </Button>
+            </div>
+          )}
+        </div>
       </section>
     </div>
   );
 }
+
